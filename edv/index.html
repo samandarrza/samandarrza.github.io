@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="az">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gələnlər & Göndərdiklərim & Əvəzləşdirmələr</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        .data-panel {
+            margin-top: 20px;
+        }
+
+        .btn-excel {
+            float: right;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+    <style>
+        @media (max-width: 768px) {
+    table thead {
+        display: none;
+    }
+
+    table, tbody, tr, td {
+        display: block;
+        width: 100%;
+    }
+
+    table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+        background: #f8f9fa;
+    }
+
+    table td {
+        padding: 8px 10px;
+        border: none;
+        border-bottom: 1px solid #ddd;
+        position: relative;
+        text-align: left;
+        font-size: 15px;
+    }
+
+    table td::before {
+        content: attr(data-label) ": ";
+        font-weight: bold;
+        display: inline-block;
+        min-width: 100px;
+        color: #333;
+    }
+
+    table td:last-child {
+        border-bottom: none;
+    }
+}
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Tablar -->
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#gelenTab">Gələnlər</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#gonderTab">Göndərdiklərim</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#evezTab">Əvəzləşdirmələr</button>
+        </li>
+    </ul>
+
+    <!-- Tab Məzmunu -->
+    <div class="tab-content">
+
+        <!-- Gələnlər -->
+        <div class="tab-pane fade show active" id="gelenTab">
+            <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#gelenModal">
+                Yeni Gələn əlavə et
+            </button>
+            <button class="btn btn-outline-secondary btn-excel" onclick="exportTableToExcel('gelenTable', 'Gelenler')">
+                Excelə Yüklə
+            </button>
+
+            <div class="data-panel table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>VÖEN</th>
+                            <th>Adı</th>
+                            <th>Tarix</th>
+                            <th>Seriya</th>
+                            <th>Nömrə</th>
+                            <th>Əsas</th>
+                            <th>Cəlb Edilən</th>
+                            <th>Cəlb Edilməyən</th>
+                            <th>Azad</th>
+                            <th>ƏDV</th>
+                            <th>Qeyd</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gelenTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Göndərdiklərim -->
+        <div class="tab-pane fade" id="gonderTab">
+            <button class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#gonderModal">
+                Yeni Göndərilən əlavə et
+            </button>
+            <button class="btn btn-outline-secondary btn-excel"
+                onclick="exportTableToExcel('gonderTable', 'Gonderdiklerim')">
+                Excelə Yüklə
+            </button>
+            <div class="data-panel table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>VÖEN</th>
+                            <th>Adı</th>
+                            <th>Tarix</th>
+                            <th>Seriya</th>
+                            <th>Nömrə</th>
+                            <th>Əsas</th>
+                            <th>Cəlb Edilən</th>
+                            <th>Cəlb Edilməyən</th>
+                            <th>Azad</th>
+                            <th>ƏDV</th>
+                            <th>Qeyd</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gonderTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Əvəzləşdirmələr -->
+        <div class="tab-pane fade" id="evezTab">
+            <button class="btn btn-warning mt-3" data-bs-toggle="modal" data-bs-target="#evezModal">
+                Yeni Əvəzləşdirmə əlavə et
+            </button>
+            <button class="btn btn-outline-secondary btn-excel"
+                onclick="exportTableToExcel('evezTable', 'Evezlesdirmeler')">
+                Excelə Yüklə
+            </button>
+            <div class="data-panel table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Seriya</th>
+                            <th>Nömrə</th>
+                            <th>Adı</th>
+                            <th>Əsas</th>
+                            <th>Ödənilən</th>
+                            <th>ƏDV</th>
+                        </tr>
+                    </thead>
+                    <tbody id="evezTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Gələnlər -->
+    <div class="modal fade" id="gelenModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form id="gelenForm" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Gələn əlavə et</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-4">
+                        <input type="text" id="g_voen" class="form-control" placeholder="VÖEN" required />
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" id="g_adi" class="form-control" placeholder="Adı" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="date" id="g_tarix" class="form-control" required />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="g_seriya" class="form-control" placeholder="Seriya" />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="g_nomre" class="form-control" placeholder="Nömrə" />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="g_esas" class="form-control" placeholder="Əsas" readonly />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="g_edv1" class="form-control" placeholder="Cəlb edilən" />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="g_edv2" class="form-control" placeholder="Cəlb edilməyən" />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="g_edv3" class="form-control" placeholder="Azad" />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="g_edv" class="form-control" placeholder="ƏDV" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" id="g_qeyd" class="form-control" placeholder="Qeyd" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Yadda saxla</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İmtina</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Göndərdiklərim -->
+    <div class="modal fade" id="gonderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form id="gonderForm" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Göndərilən əlavə et</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-4">
+                        <input type="text" id="d_voen" class="form-control" placeholder="VÖEN" required />
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" id="d_adi" class="form-control" placeholder="Adı" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="date" id="d_tarix" class="form-control" required />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="d_seriya" class="form-control" placeholder="Seriya" />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="d_nomre" class="form-control" placeholder="Nömrə" />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="d_esas" class="form-control" placeholder="Əsas" readonly />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="d_edv1" class="form-control" placeholder="Cəlb edilən" />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="d_edv2" class="form-control" placeholder="Cəlb edilməyən" />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="d_edv3" class="form-control" placeholder="Azad" />
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" id="d_edv" class="form-control" placeholder="ƏDV" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" id="d_qeyd" class="form-control" placeholder="Qeyd" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Yadda saxla</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İmtina</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Əvəzləşdirmələr -->
+    <div class="modal fade" id="evezModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form id="evezForm" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Yeni Əvəzləşdirmə əlavə et</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-4">
+                        <input type="text" id="evez_seriya" class="form-control" placeholder="Seriya" required />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="evez_nomre" class="form-control" placeholder="Nömrə" required />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="evez_adi" class="form-control" placeholder="Adı" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="number" id="evez_esas" class="form-control" placeholder="Əsas" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="number" id="evez_odenilen" class="form-control" placeholder="Ödənilən" required />
+                    </div>
+                    <div class="col-md-4">
+                        <input type="number" id="evez_edv" class="form-control" placeholder="ƏDV" readonly />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning">Yadda saxla</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İmtina</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Kitabxanalar -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
+    <script>
+        // Demo VÖEN və ad bazası
+        const voenDatabase = {
+            "1234567890": "Azerbaijan Food MMC",
+            "1111111111": "Bakı Texnologiya LTD",
+            "2222222222": "Xəzər İnşaat MMC"
+        };
+
+        // Gələnlər məlumatları massiv
+        const gelenlerData = [];
+
+        // VÖEN daxil edildikdə adı doldur
+        ['g', 'd'].forEach(prefix => {
+            document.getElementById(prefix + '_voen').addEventListener('input', function () {
+                const voen = this.value;
+                const adiInput = document.getElementById(prefix + '_adi');
+                if (voen.length === 10 && voenDatabase[voen]) {
+                    adiInput.value = voenDatabase[voen];
+                } else {
+                    adiInput.value = '';
+                }
+            });
+        });
+
+        // Əsas və ƏDV hesablama funksiyası
+        function calcMeblegler(prefix) {
+            const edv1 = +document.getElementById(prefix + '_edv1').value || 0;
+            const edv2 = +document.getElementById(prefix + '_edv2').value || 0;
+            const edv3 = +document.getElementById(prefix + '_edv3').value || 0;
+
+            document.getElementById(prefix + '_esas').value = (edv1 + edv2 + edv3).toFixed(2);
+            document.getElementById(prefix + '_edv').value = (edv1 * 0.18).toFixed(2);
+        }
+
+        ['g', 'd'].forEach(prefix => {
+            ['edv1', 'edv2', 'edv3'].forEach(field => {
+                document.getElementById(prefix + '_' + field).addEventListener('input', () => calcMeblegler(prefix));
+            });
+        });
+
+        // Gələnlər cədvələ əlavə et
+        function addRow(prefix, tableId) {
+            const fields = [
+                ['voen', 'VÖEN'],
+                ['adi', 'Adı'],
+                ['tarix', 'Tarix'],
+                ['seriya', 'Seriya'],
+                ['nomre', 'Nömrə'],
+                ['esas', 'Əsas'],
+                ['edv1', 'Cəlb Edilən'],
+                ['edv2', 'Cəlb Edilməyən'],
+                ['edv3', 'Azad'],
+                ['edv', 'ƏDV'],
+                ['qeyd', 'Qeyd']
+            ];
+            const tr = document.createElement('tr');
+            tr.innerHTML = fields.map(([f, label]) => {
+                const val = document.getElementById(prefix + '_' + f).value || '';
+                return `<td data-label="${label}">${val}</td>`;
+            }).join('');
+            document.getElementById(tableId).appendChild(tr);
+        }
+
+        // Gələnlər form submit, massivə əlavə
+        document.getElementById('gelenForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const voen = document.getElementById('g_voen').value;
+            if (voen.length !== 10 || !voenDatabase[voen]) {
+                alert('VÖEN 10 rəqəmli olmalı və sistemdə mövcud olmalıdır.');
+                return;
+            }
+            addRow('g', 'gelenTable');
+
+            // Gələn məlumatı massivə əlavə et
+            gelenlerData.push({
+                voen: document.getElementById('g_voen').value,
+                adi: document.getElementById('g_adi').value,
+                tarix: document.getElementById('g_tarix').value,
+                seriya: document.getElementById('g_seriya').value,
+                nomre: document.getElementById('g_nomre').value,
+                esas: +document.getElementById('g_esas').value || 0,
+                edv1: +document.getElementById('g_edv1').value || 0,
+                edv2: +document.getElementById('g_edv2').value || 0,
+                edv3: +document.getElementById('g_edv3').value || 0,
+                edv: +document.getElementById('g_edv').value || 0,
+                qeyd: document.getElementById('g_qeyd').value,
+            });
+
+            bootstrap.Modal.getInstance(document.getElementById('gelenModal')).hide();
+            e.target.reset();
+            document.getElementById('g_tarix').value = new Date().toISOString().split('T')[0];
+        });
+
+        // Göndərdiklərim form submit
+        document.getElementById('gonderForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const voen = document.getElementById('d_voen').value;
+            if (voen.length !== 10 || !voenDatabase[voen]) {
+                alert('VÖEN 10 rəqəmli olmalı və sistemdə mövcud olmalıdır.');
+                return;
+            }
+            addRow('d', 'gonderTable');
+            bootstrap.Modal.getInstance(document.getElementById('gonderModal')).hide();
+            e.target.reset();
+            document.getElementById('d_tarix').value = new Date().toISOString().split('T')[0];
+        });
+
+        // Əvəzləşdirmə üçün avtomatik doldurma
+
+        const evezSeriya = document.getElementById('evez_seriya');
+        const evezNomre = document.getElementById('evez_nomre');
+        const evezAdi = document.getElementById('evez_adi');
+        const evezEsas = document.getElementById('evez_esas');
+        const evezOdenilen = document.getElementById('evez_odenilen');
+        const evezEdv = document.getElementById('evez_edv');
+
+        function findGelenBySeriaNomre() {
+            const seriya = evezSeriya.value.trim();
+            const nomre = evezNomre.value.trim();
+
+            if (!seriya || !nomre) {
+                evezEsas.value = '';
+                evezAdi.value = '';
+                return;
+            }
+
+            const found = gelenlerData.find(item => item.seriya === seriya && item.nomre === nomre);
+            if (found) {
+                evezEsas.value = found.esas.toFixed(2);
+                evezAdi.value = found.adi;
+            } else {
+                evezEsas.value = '';
+                evezAdi.value = '';
+            }
+        }
+
+        evezSeriya.addEventListener('input', findGelenBySeriaNomre);
+        evezNomre.addEventListener('input', findGelenBySeriaNomre);
+
+        // Ödənilən əsasında ƏDV hesabla (18%)
+        evezOdenilen.addEventListener('input', () => {
+            const odenilen = +evezOdenilen.value || 0;
+            evezEdv.value = (odenilen * 0.18).toFixed(2);
+        });
+
+        // Əvəzləşdirmə form submit
+        document.getElementById('evezForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const seriya = evezSeriya.value.trim();
+            const nomre = evezNomre.value.trim();
+            const adi = evezAdi.value;
+            const esas = +evezEsas.value || 0;
+            const odenilen = +evezOdenilen.value || 0;
+            const edv = +evezEdv.value || 0;
+
+            if (!seriya || !nomre || !adi || !esas || !odenilen) {
+                alert('Bütün sahələri düzgün doldurun!');
+                return;
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${seriya}</td>
+                <td>${nomre}</td>
+                <td>${adi}</td>
+                <td>${esas.toFixed(2)}</td>
+                <td>${odenilen.toFixed(2)}</td>
+                <td>${edv.toFixed(2)}</td>
+            `;
+            document.getElementById('evezTable').appendChild(tr);
+
+            bootstrap.Modal.getInstance(document.getElementById('evezModal')).hide();
+            e.target.reset();
+            evezEdv.value = '';
+        });
+
+        // Excel-ə yükləmə funksiyası
+        function exportTableToExcel(tableID, filename = '') {
+            const table = document.getElementById(tableID);
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+            XLSX.writeFile(wb, filename ? filename + '.xlsx' : 'export.xlsx');
+        }
+
+        // Modal açılarkən tarixi avtomatik doldur
+        ['g_tarix', 'd_tarix'].forEach(id => {
+            document.getElementById(id).value = new Date().toISOString().split('T')[0];
+        });
+
+        tr.innerHTML = fields.map((f, i) => {
+            const val = document.getElementById(prefix + '_' + f).value || '';
+            const headers = ["VÖEN", "Adı", "Tarix", "Seriya", "Nömrə", "Əsas", "Cəlb Edilən", "Cəlb Edilməyən", "Azad", "ƏDV", "Qeyd"];
+            return `<td data-label="${headers[i]}">${val}</td>`;
+        }).join('');
+    </script>
+</body>
+
+</html>
