@@ -44,19 +44,19 @@ function calculateResult(turnover, serviceType, taxpayer, employees, vatPayer, f
 
     if (serviceType === 'micro') {
         result += 50;
-        result += Math.max(110, Math.floor(turnover / 9000) * 10);
+        result += Math.max(110, Math.floor(turnover / 90000) * 10);
     }
 
     if (serviceType === 'small') {
         result += 100;
         if (turnover>1000000) {
-            result += Math.max(700, Math.floor(turnover / 23000) * 10);
+            result += Math.max(700, Math.floor(turnover / 230000) * 10);
         }
         else if (turnover>1500000) {
-            result += Math.max(1000, Math.floor(turnover / 30000) * 10);
+            result += Math.max(1000, Math.floor(turnover / 300000) * 10);
         }
         else{
-            result += Math.max(155, Math.floor(turnover / 14000) * 10);
+            result += Math.max(155, Math.floor(turnover / 140000) * 10);
         }
     }
 
@@ -65,7 +65,7 @@ function calculateResult(turnover, serviceType, taxpayer, employees, vatPayer, f
     if (taxpayer === 'simplified') {
         result += 70;
     } else if (taxpayer === 'profit' || taxpayer === 'income') {
-        result += 85;
+        result += 90;
     }
 
     if (vatPayer === 'yes') {
